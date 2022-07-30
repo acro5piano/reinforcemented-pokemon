@@ -33,6 +33,8 @@ impl State {
             1.0
         } else {
             0.0
+            // let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;
+            // distance_power_2.sqrt()
         }
 
         // let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;

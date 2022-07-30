@@ -17,10 +17,10 @@ fn main() {
             state: state::State::new(),
         };
 
-        let alpha = 0.2;
-        let gamma = 0.8;
+        let alpha = 0.1;
+        let gamma = 0.9;
 
-        for _step in 0..100 {
+        for _step in 0..1000 {
             if agent.state.x == 3 && agent.state.y == 3 {
                 break;
             }
