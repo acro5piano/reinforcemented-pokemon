@@ -8,6 +8,8 @@ pub struct Agent {
 impl Agent {
     pub fn take_action(&mut self, action: &Action) -> () {
         match (self.state.x, self.state.y, action) {
+            (3, 3, _) => {}
+
             (1, 1, Action::RIGHT) => self.state.x += 1,
             (1, 1, Action::DOWN) => self.state.y += 1,
             (1, 2, Action::UP) => self.state.y -= 1,
@@ -27,8 +29,6 @@ impl Agent {
             (3, 1, Action::LEFT) => self.state.x -= 1,
             (3, 2, Action::UP) => self.state.y -= 1,
             (3, 2, Action::LEFT) => self.state.x -= 1,
-
-            (3, 3, Action::LEFT) => self.state.x -= 1,
 
             (_, _, _) => {}
         }

@@ -21,7 +21,6 @@ pub enum Action {
     DOWN,
     LEFT,
     RIGHT,
-    DoNothing,
 }
 
 impl State {
@@ -29,20 +28,24 @@ impl State {
         State { x: 1, y: 1 }
     }
 
-    pub fn reward(&self, step: i32) -> f64 {
-        let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;
-        10.0 * distance_power_2.sqrt() - 0.001 * step as f64
+    pub fn reward(&self) -> f64 {
+        if self.x == 3 && self.y == 3 {
+            1.0
+        } else {
+            0.0
+        }
+
+        // let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;
+        // 10.0 * distance_power_2.sqrt() - 0.001 * step as f64
     }
 
-    pub fn pick_action(&mut self) -> Action {
+    pub fn actions(&mut self) -> Vec<Action> {
+        vec![Action::UP, Action::LEFT, Action::DOWN, Action::RIGHT]
+    }
+
+    pub fn pick_random_action(&mut self) -> Action {
         // TODO: consider already learned state
-        let actions = vec![
-            Action::UP,
-            Action::LEFT,
-            Action::DOWN,
-            Action::RIGHT,
-            Action::DoNothing,
-        ];
+        let actions = self.actions();
         let a_t = rand::random::<usize>() % actions.len();
         actions[a_t].clone()
     }
