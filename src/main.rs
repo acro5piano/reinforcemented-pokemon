@@ -19,9 +19,8 @@ fn main() {
 
     let mut q: Q = HashMap::new();
 
-    for step in 0..10000 {
+    for step in 0..100000 {
         // dbg!("-----------------------------");
-        // dbg!(&step);
 
         let s_t = agent.state.clone();
         let action = agent.state.pick_action();
@@ -31,7 +30,7 @@ fn main() {
         // dbg!(&agent.state);
 
         let s_t_next = agent.state.clone();
-        let r_t_next = agent.state.reward();
+        let r_t_next = agent.state.reward(step);
 
         let v_t = {
             let old_value = q
