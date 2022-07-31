@@ -29,16 +29,17 @@ impl State {
     }
 
     pub fn reward(&self) -> f64 {
-        if self.x == 3 && self.y == 3 {
-            1.0
-        } else {
-            0.0
+        match (self.x, self.y) {
+            (3, 3) => 1.0,
+
+            // There is and idea to add more reward if the agent is closer to the goal
+            // However, it actually does not contribute to the agent learning process.
+            // I have to deep-dive into the problem to find the right solution.
+            //
             // let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;
             // distance_power_2.sqrt()
+            _ => 0.0,
         }
-
-        // let distance_power_2 = ((1 - self.x).pow(2) + (1 - self.y).pow(2)) as f64;
-        // 10.0 * distance_power_2.sqrt() - 0.001 * step as f64
     }
 
     pub fn actions(&mut self) -> Vec<Action> {
