@@ -1,5 +1,7 @@
 use rand::prelude::*;
 use std::collections::HashMap;
+use std::thread::sleep;
+use std::time::Duration;
 
 mod agent;
 mod state;
@@ -20,7 +22,7 @@ fn main() {
         let alpha = 0.1;
         let gamma = 0.9;
 
-        for _step in 0..1000 {
+        for step in 0..1000 {
             if agent.state.x == 3 && agent.state.y == 3 {
                 break;
             }
@@ -62,6 +64,13 @@ fn main() {
             q.entry(s_t)
                 .or_insert_with(HashMap::new)
                 .insert(action, v_t);
+
+            println!("step: {}\n", step);
+            dbg!(&q.get(&state::State { x: 1, y: 1 }).unwrap());
+            agent.state.render();
+            print!("\x1B[2J\x1B[1;1H");
+
+            sleep(Duration::from_millis(20));
         }
     }
 

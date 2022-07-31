@@ -51,4 +51,27 @@ impl State {
         let a_t = rand::random::<usize>() % actions.len();
         actions[a_t].clone()
     }
+
+    pub fn render(&self) {
+        println!();
+        for y in 1..4 {
+            print!("{}", "|");
+            for x in 1..4 {
+                let elm = if x == self.x && y == self.y {
+                    "*"
+                } else if x == 3 && y == 3 {
+                    "G"
+                } else {
+                    " "
+                };
+                let wall = match (x, y) {
+                    (1, 2) => "x",
+                    (1, 3) => "x",
+                    (_, _) => ":",
+                };
+                print!("{}{}", elm, wall);
+            }
+            println!("|");
+        }
+    }
 }
