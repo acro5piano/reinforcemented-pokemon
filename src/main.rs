@@ -22,7 +22,7 @@ fn main() {
         let alpha = 0.1;
         let gamma = 0.9;
 
-        for step in 0..1000 {
+        for _step in 0..1000 {
             if agent.state.x == 3 && agent.state.y == 3 {
                 break;
             }
@@ -65,12 +65,15 @@ fn main() {
                 .or_insert_with(HashMap::new)
                 .insert(action, v_t);
 
-            println!("step: {}\n", step);
-            dbg!(&q.get(&state::State { x: 1, y: 1 }).unwrap());
-            agent.state.render();
-            print!("\x1B[2J\x1B[1;1H");
-
-            sleep(Duration::from_millis(20));
+            #[cfg(feature = "visual")]
+            {
+                print!("\x1B[2J\x1B[1;1H");
+                println!("step: {}\n", _step);
+                agent.state.render();
+                println!();
+                dbg!(&q.get(&state::State { x: 1, y: 1 }).unwrap());
+                sleep(Duration::from_millis(20));
+            }
         }
     }
 

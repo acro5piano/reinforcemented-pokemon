@@ -52,6 +52,7 @@ impl State {
         actions[a_t].clone()
     }
 
+    #[cfg(feature = "visual")]
     pub fn render(&self) {
         println!();
         for y in 1..4 {
