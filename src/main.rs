@@ -1,72 +1,141 @@
-use rand::prelude::*;
+mod q_learning;
+
+use crate::q_learning::{agent::Agent, state::State, trainer::train};
 use std::collections::HashMap;
-use std::thread::sleep;
-use std::time::Duration;
 
-mod agent;
-mod state;
+// The state is this maze
+//
+//     1   2   3
+//   |------------|
+// 1 | S :    :   |
+//   |------------|
+// 2 |   X    :   |
+//   |---------xxx|
+// 3 |   X    : G |
+//   |------------|
+#[derive(Debug, Hash, Clone, Eq, PartialEq)]
+pub struct MazeState {
+    pub x: i32,
+    pub y: i32,
+}
 
-const INITIAL_VALUE: f64 = 2.0;
+#[derive(Debug, Hash, Clone, Eq, PartialEq)]
+pub enum MazeAction {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+}
 
-type ActionValue = HashMap<state::Action, f64>;
-type Q = HashMap<state::State, ActionValue>;
+impl State for MazeState {
+    type Action = MazeAction;
+
+    fn new() -> Self {
+        MazeState { x: 1, y: 1 }
+    }
+
+    fn reward(&self) -> f64 {
+        match (self.x, self.y) {
+            (3, 3) => 1.0,
+            _ => 0.0,
+        }
+    }
+
+    fn actions(&self) -> Vec<MazeAction> {
+        vec![
+            MazeAction::UP,
+            MazeAction::LEFT,
+            MazeAction::DOWN,
+            MazeAction::RIGHT,
+        ]
+    }
+
+    #[cfg(feature = "visual")]
+    fn render(&self) {
+        println!();
+        for y in 1..4 {
+            print!("{}", "|");
+            for x in 1..4 {
+                let elm = if x == self.x && y == self.y {
+                    "*"
+                } else if x == 3 && y == 3 {
+                    "G"
+                } else {
+                    " "
+                };
+                let wall = match (x, y) {
+                    (1, 2) => "x",
+                    (1, 3) => "x",
+                    (_, _) => ":",
+                };
+                print!("{}{}", elm, wall);
+            }
+            println!("|");
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct MazeAgent {
+    pub state: MazeState,
+}
+
+impl Agent<MazeState> for MazeAgent {
+    fn current_state(&self) -> &MazeState {
+        &self.state
+    }
+
+    fn take_action(&mut self, action: &MazeAction) {
+        match (self.state.x, self.state.y, action) {
+            (3, 3, _) => {}
+
+            (1, 1, MazeAction::RIGHT) => self.state.x += 1,
+            (1, 1, MazeAction::DOWN) => self.state.y += 1,
+            (1, 2, MazeAction::UP) => self.state.y -= 1,
+            (1, 2, MazeAction::DOWN) => self.state.y += 1,
+            (1, 3, MazeAction::UP) => self.state.y -= 1,
+
+            (2, 1, MazeAction::RIGHT) => self.state.x += 1,
+            (2, 1, MazeAction::LEFT) => self.state.x -= 1,
+            (2, 1, MazeAction::DOWN) => self.state.y += 1,
+            (2, 2, MazeAction::UP) => self.state.y -= 1,
+            (2, 2, MazeAction::RIGHT) => self.state.x += 1,
+            (2, 2, MazeAction::DOWN) => self.state.y += 1,
+            (2, 3, MazeAction::UP) => self.state.y -= 1,
+            (2, 3, MazeAction::RIGHT) => self.state.x += 1,
+
+            (3, 1, MazeAction::DOWN) => self.state.y += 1,
+            (3, 1, MazeAction::LEFT) => self.state.x -= 1,
+            (3, 2, MazeAction::UP) => self.state.y -= 1,
+            (3, 2, MazeAction::LEFT) => self.state.x -= 1,
+
+            (_, _, _) => {}
+        }
+    }
+}
+
+type ActionValue = HashMap<MazeAction, f64>;
+type Q = HashMap<MazeState, ActionValue>;
 
 fn main() {
     let mut q: Q = HashMap::new();
 
     for _ in 0..10000 {
-        let mut agent = agent::Agent {
-            state: state::State::new(),
+        let mut agent = MazeAgent {
+            state: MazeState::new(),
         };
-
-        let alpha = 0.1;
-        let gamma = 0.9;
 
         for _step in 0..1000 {
             if agent.state.x == 3 && agent.state.y == 3 {
                 break;
             }
 
-            let s_t = agent.state.clone();
-            let action = {
-                let rng = rand::thread_rng().gen::<f32>();
-                let existing = q.get(&s_t);
-                if existing.is_some() && rng > 0.8 {
-                    existing
-                        .unwrap()
-                        .iter()
-                        .max_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap())
-                        .unwrap()
-                        .0
-                        .clone()
-                } else {
-                    agent.state.pick_random_action()
-                }
-            };
-
-            agent.take_action(&action);
-
-            let s_t_next = agent.state.clone();
-            let r_t_next = agent.state.reward();
-
-            let v_t = {
-                let old_value = q
-                    .get(&s_t)
-                    .and_then(|m| m.get(&action))
-                    .unwrap_or(&INITIAL_VALUE);
-                let max_next = q
-                    .get(&s_t_next)
-                    .and_then(|m| m.values().max_by(|a, b| a.partial_cmp(b).unwrap()))
-                    .unwrap_or(&INITIAL_VALUE);
-                (1.0 - alpha) * (old_value) + alpha * (r_t_next + gamma * max_next)
-            };
-
-            q.entry(s_t)
-                .or_insert_with(HashMap::new)
-                .insert(action, v_t);
+            train(&mut q, &mut agent);
 
             #[cfg(feature = "visual")]
             {
+                use std::thread::sleep;
+                use std::time::Duration;
                 print!("\x1B[2J\x1B[1;1H");
                 println!("step: {}\n", _step);
                 agent.state.render();
