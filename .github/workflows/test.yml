@@ -1,0 +1,31 @@
+name: test
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - '.github/workflows/**'
+      - 'Cargo.*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v3
+        with:
+          key: v2-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          path: |
+            target
+            ~/.cargo
+          restore-keys: |
+            v1-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+            v1-${{ runner.os }}
+            v1-
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+      - name: Test
+        run: |
+          cargo check
+          cargo test
