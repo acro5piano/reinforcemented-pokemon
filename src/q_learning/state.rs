@@ -14,7 +14,4 @@ pub trait State: Eq + Hash + Clone {
         let a_t = rand::random::<usize>() % actions.len();
         actions[a_t].clone()
     }
-
-    #[cfg(feature = "visual")]
-    fn render(&self);
 }

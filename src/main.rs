@@ -49,9 +49,11 @@ impl State for MazeState {
             MazeAction::RIGHT,
         ]
     }
+}
 
-    #[cfg(feature = "visual")]
-    fn render(&self) {
+#[allow(dead_code)]
+impl MazeState {
+    fn debug(&self) {
         println!();
         for y in 1..4 {
             print!("{}", "|");
@@ -120,11 +122,23 @@ impl Agent<MazeState> for MazeAgent {
 
 fn main() {
     let mut trainer = Trainer {
-        initial_value: 0.2,
+        initial_value: 0.0,
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
+        on_step: None,
+        // on_step: Some(|step, state: &MazeState, q| {
+        //     use std::thread::sleep;
+        //     use std::time::Duration;
+        //     print!("\x1B[2J\x1B[1;1H");
+        //     println!("step: {}\n", step);
+        //     state.debug();
+        //     println!();
+        //     dbg!(&q.get(&MazeState { x: 1, y: 1 }).unwrap());
+        //     sleep(Duration::from_millis(20));
+        // }),
     };
+
     trainer.train(|| {
         Box::new(MazeAgent {
             state: MazeState::new(),

@@ -13,6 +13,7 @@ pub struct Trainer<S, A> {
     pub alpha: f64,
     pub gamma: f64,
     pub q: Q<S, A>,
+    pub on_step: Option<fn(i32, &S, q: &Q<S, A>) -> ()>,
 }
 
 impl<S, A> Trainer<S, A>
@@ -24,7 +25,7 @@ where
         for _ in 0..10000 {
             let mut agent = agent_factory();
 
-            for _step in 0..1000 {
+            for step in 0..1000 {
                 if agent.is_completed() {
                     break;
                 }
@@ -72,16 +73,8 @@ where
                     .or_insert_with(HashMap::new)
                     .insert(action, v_t);
 
-                #[cfg(feature = "visual")]
-                {
-                    use std::thread::sleep;
-                    use std::time::Duration;
-                    print!("\x1B[2J\x1B[1;1H");
-                    println!("step: {}\n", _step);
-                    agent.state.render();
-                    println!();
-                    dbg!(&self.q.get(&state::State { x: 1, y: 1 }).unwrap());
-                    sleep(Duration::from_millis(20));
+                if let Some(on_step) = self.on_step {
+                    on_step(step, &agent.current_state(), &self.q);
                 }
             }
         }
