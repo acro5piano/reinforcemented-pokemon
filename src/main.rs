@@ -1,6 +1,6 @@
 mod q_learning;
 
-use crate::q_learning::{agent::Agent, state::State, trainer::train};
+use crate::q_learning::{agent::Agent, state::State, trainer::Trainer};
 use std::collections::HashMap;
 
 // The state is this maze
@@ -118,17 +118,18 @@ impl Agent<MazeState> for MazeAgent {
     }
 }
 
-type ActionValue = HashMap<MazeAction, f64>;
-type Q = HashMap<MazeState, ActionValue>;
-
 fn main() {
-    let mut q: Q = HashMap::new();
-
-    train(&mut q, || {
+    let mut trainer = Trainer {
+        initial_value: 0.2,
+        alpha: 0.1,
+        gamma: 0.9,
+        q: HashMap::new(),
+    };
+    trainer.train(|| {
         Box::new(MazeAgent {
             state: MazeState::new(),
         })
     });
 
-    dbg!(&q);
+    dbg!(&trainer.q);
 }
