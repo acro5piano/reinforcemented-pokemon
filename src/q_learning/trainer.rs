@@ -1,7 +1,6 @@
 use crate::q_learning::{agent::Agent, state::State};
 use rand::prelude::*;
 use std::collections::HashMap;
-use std::fmt::Debug;
 use std::hash::Hash;
 
 pub type AgentFactory<S> = fn() -> Box<dyn Agent<S>>;
@@ -18,8 +17,8 @@ pub struct Trainer<S, A> {
 
 impl<S, A> Trainer<S, A>
 where
-    S: State + State<Action = A>,
-    A: Eq + Hash + Clone + Debug,
+    S: State<Action = A>,
+    A: Eq + Hash + Clone,
 {
     pub fn train(&mut self, agent_factory: AgentFactory<S>) {
         for _ in 0..10000 {
