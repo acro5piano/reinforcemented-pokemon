@@ -112,6 +112,10 @@ impl Agent<MazeState> for MazeAgent {
             (_, _, _) => {}
         }
     }
+
+    fn is_completed(&self) -> bool {
+        self.state.x == 3 && self.state.y == 3
+    }
 }
 
 type ActionValue = HashMap<MazeAction, f64>;
@@ -120,31 +124,11 @@ type Q = HashMap<MazeState, ActionValue>;
 fn main() {
     let mut q: Q = HashMap::new();
 
-    for _ in 0..10000 {
-        let mut agent = MazeAgent {
+    train(&mut q, || {
+        Box::new(MazeAgent {
             state: MazeState::new(),
-        };
-
-        for _step in 0..1000 {
-            if agent.state.x == 3 && agent.state.y == 3 {
-                break;
-            }
-
-            train(&mut q, &mut agent);
-
-            #[cfg(feature = "visual")]
-            {
-                use std::thread::sleep;
-                use std::time::Duration;
-                print!("\x1B[2J\x1B[1;1H");
-                println!("step: {}\n", _step);
-                agent.state.render();
-                println!();
-                dbg!(&q.get(&state::State { x: 1, y: 1 }).unwrap());
-                sleep(Duration::from_millis(20));
-            }
-        }
-    }
+        })
+    });
 
     dbg!(&q);
 }
