@@ -52,10 +52,12 @@ impl State for SimplePokemonState {
     }
 
     fn reward(&self) -> f64 {
-        if self.competitor.pokemon0.hp <= 0 && self.competitor.pokemon1.hp <= 0 {
+        if self.competitor.pokemon0.hp == 0 && self.competitor.pokemon1.hp == 0 {
             1.0
+        } else if self.learner.pokemon0.hp == 0 && self.learner.pokemon1.hp == 0 {
+            -1.0
         } else {
-            0.0
+            -0.01
         }
     }
 
@@ -109,14 +111,27 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
                     self.state.learner.pokemon0 = *pokemon0;
                     self.state.learner.pokemon1 = *pokemon1;
                 }
-                _ => {} // _ => panic!("This should not happen."),
+                _ => panic!("This should not happen."),
             };
         } else {
             self.state.is_choosing = false;
-            // Random player
-            let competitor_action = self.state.pick_random_action(step);
 
-            match (&action, &competitor_action) {
+            let learner_inactive_pokemon = self.state.learner.get_inactive_pokemon();
+            let learner_action = if learner_inactive_pokemon.hp > 0 {
+                action
+            } else {
+                &PokemonAction::Fight
+            };
+
+            // Random player
+            let competitor_inactive_pokemon = self.state.competitor.get_inactive_pokemon();
+            let competitor_action = if competitor_inactive_pokemon.hp > 0 {
+                self.state.pick_random_action(step)
+            } else {
+                PokemonAction::Fight
+            };
+
+            match (&learner_action, &competitor_action) {
                 (PokemonAction::Fight, PokemonAction::Fight) => {
                     let mut learner_active_pokemon = self.state.learner.get_active_pokemon();
                     let mut competitor_active_pokemon = self.state.competitor.get_active_pokemon();
@@ -167,20 +182,21 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
                     self.state.learner.change_active_pokemon();
                 }
                 _ => {
-                    // TODO: prevent this pattern
-                    // picking learned value should be validated
-                    // dbg!(&step);
-                    // dbg!(&competitor_action);
-                    // dbg!(&action);
-                    // panic!("This should not happen.");
+                    panic!("This should not happen.");
                 }
+            }
+            if self.state.learner.get_active_pokemon().hp == 0 {
+                self.state.learner.change_active_pokemon();
+            }
+            if self.state.competitor.get_active_pokemon().hp == 0 {
+                self.state.competitor.change_active_pokemon();
             }
         }
     }
 
     fn is_completed(&self, _step: i32) -> bool {
-        (self.state.learner.pokemon0.hp <= 0 && self.state.learner.pokemon1.hp <= 0)
-            || (self.state.competitor.pokemon0.hp <= 0 && self.state.competitor.pokemon1.hp <= 0)
+        (self.state.learner.pokemon0.hp == 0 && self.state.learner.pokemon1.hp == 0)
+            || (self.state.competitor.pokemon0.hp == 0 && self.state.competitor.pokemon1.hp == 0)
     }
 }
 
@@ -192,7 +208,7 @@ fn main() {
         q: HashMap::new(),
         e: 0.9,
         max_step: 100,
-        episodes: 10000000,
+        episodes: 100000,
         on_step: None,
     };
 

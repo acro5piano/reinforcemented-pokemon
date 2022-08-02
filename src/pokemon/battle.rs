@@ -1,28 +1,33 @@
 use super::pokemon;
 
-pub fn calculate_damage(attacker: &pokemon::Pokemon, defender: &pokemon::Pokemon) -> i32 {
-    match (attacker, defender) {
-        (&pokemon::RHYDON, &pokemon::JOLTEON) => 388,
-        (&pokemon::RHYDON, &pokemon::STARMIE) => 156,
-        (&pokemon::RHYDON, &pokemon::RHYDON) => 251,
-        (&pokemon::RHYDON, &pokemon::CLEFAIRY) => 217,
+pub fn calculate_damage(attacker: &pokemon::Pokemon, defender: &pokemon::Pokemon) -> u32 {
+    let damage = match (attacker.id, defender.id) {
+        (1, 1) => 251,
+        (1, 2) => 388,
+        (1, 3) => 156,
+        (1, 4) => 217,
 
-        (&pokemon::JOLTEON, &pokemon::RHYDON) => 0,
-        (&pokemon::JOLTEON, &pokemon::JOLTEON) => 55,
-        (&pokemon::JOLTEON, &pokemon::STARMIE) => 240,
-        (&pokemon::JOLTEON, &pokemon::CLEFAIRY) => 163,
+        (2, 1) => 0,
+        (2, 2) => 55,
+        (2, 3) => 240,
+        (2, 4) => 163,
 
-        (&pokemon::STARMIE, &pokemon::RHYDON) => 703,
-        (&pokemon::STARMIE, &pokemon::JOLTEON) => 105,
-        (&pokemon::STARMIE, &pokemon::STARMIE) => 55,
-        (&pokemon::STARMIE, &pokemon::CLEFAIRY) => 153,
+        (3, 1) => 703,
+        (3, 2) => 105,
+        (3, 3) => 55,
+        (3, 4) => 153,
 
-        (&pokemon::CLEFAIRY, &pokemon::RHYDON) => 27,
-        (&pokemon::CLEFAIRY, &pokemon::JOLTEON) => 86,
-        (&pokemon::CLEFAIRY, &pokemon::STARMIE) => 72,
-        (&pokemon::CLEFAIRY, &pokemon::CLEFAIRY) => 98,
+        (4, 1) => 27,
+        (4, 2) => 86,
+        (4, 3) => 72,
+        (4, 4) => 98,
 
-        // TODO: add all combinations.
-        (_, _) => 100,
+        (_, _) => panic!("This should not happen."),
+    };
+
+    if damage > defender.hp {
+        defender.hp
+    } else {
+        damage
     }
 }

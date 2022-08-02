@@ -4,7 +4,7 @@ use rand;
 #[derive(Copy, Debug, Hash, Clone, Eq, PartialEq)]
 pub struct Pokemon {
     pub id: i32,
-    pub hp: i32,
+    pub hp: u32,
     // pub attack: i32,
     // pub defense: i32,
     // pub special: i32,

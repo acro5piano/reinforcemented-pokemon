@@ -37,15 +37,27 @@ where
                 let action = {
                     let rng = rand::thread_rng().gen::<f32>();
                     let existing = self.q.get(&s_t);
-                    // TODO: consider step is >0
+
                     if existing.is_some() && rng > self.e {
-                        existing
+                        let act = existing
                             .unwrap()
                             .iter()
                             .max_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap())
                             .unwrap()
                             .0
-                            .clone()
+                            .clone();
+                        // consider step is >0
+                        let mut is_available = false;
+                        s_t.actions(step).iter().for_each(|a| {
+                            if a == &act {
+                                is_available = true;
+                            }
+                        });
+                        if is_available {
+                            act
+                        } else {
+                            s_t.pick_random_action(step)
+                        }
                     } else {
                         s_t.pick_random_action(step)
                     }
