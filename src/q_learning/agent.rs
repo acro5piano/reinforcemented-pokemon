@@ -5,5 +5,5 @@ pub trait Agent<S: State> {
 
     fn take_action(&mut self, action: &S::Action);
 
-    fn is_completed(&self) -> bool;
+    fn is_completed(&self, step: i32) -> bool;
 }

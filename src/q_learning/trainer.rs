@@ -11,6 +11,8 @@ pub struct Trainer<S, A> {
     pub initial_value: f64,
     pub alpha: f64,
     pub gamma: f64,
+    pub max_step: i32,
+    pub episodes: i32,
     pub q: Q<S, A>,
     pub on_step: Option<fn(i32, &S, q: &Q<S, A>) -> ()>,
 }
@@ -21,11 +23,11 @@ where
     A: Eq + Hash + Clone,
 {
     pub fn train(&mut self, agent_factory: AgentFactory<S>) {
-        for _ in 0..10000 {
+        for _ in 0..self.episodes {
             let mut agent = agent_factory();
 
-            for step in 0..1000 {
-                if agent.is_completed() {
+            for step in 0..self.max_step {
+                if agent.is_completed(step) {
                     break;
                 }
 

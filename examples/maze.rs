@@ -113,7 +113,7 @@ impl Agent<MazeState> for MazeAgent {
         }
     }
 
-    fn is_completed(&self) -> bool {
+    fn is_completed(&self, _step: i32) -> bool {
         self.state.x == 3 && self.state.y == 3
     }
 }
@@ -124,6 +124,8 @@ fn main() {
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
+        max_step: 1000,
+        episodes: 100000,
         on_step: None,
         // on_step: Some(|step, state: &MazeState, q| {
         //     use std::thread::sleep;
