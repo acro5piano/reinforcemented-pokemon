@@ -50,7 +50,7 @@ where
                     }
                 };
 
-                agent.take_action(&action);
+                agent.take_action(step, &action);
 
                 let s_t_next = agent.current_state().clone();
                 let r_t_next = s_t_next.reward();

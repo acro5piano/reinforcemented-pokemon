@@ -98,7 +98,7 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
         &self.state
     }
 
-    fn take_action(&mut self, action: &SimplePokemonAction) {
+    fn take_action(&mut self, _step: i32, action: &SimplePokemonAction) {
         // The competitor is stupid and take a random action.
         self.state.competitor.pokemon = match self.state.pick_random_action() {
             SimplePokemonAction::ChooseRhydon => Pokemon::Rhydon,

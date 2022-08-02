@@ -85,7 +85,7 @@ impl Agent<MazeState> for MazeAgent {
         &self.state
     }
 
-    fn take_action(&mut self, action: &MazeAction) {
+    fn take_action(&mut self, _step: i32, action: &MazeAction) {
         match (self.state.x, self.state.y, action) {
             (3, 3, _) => {}
 

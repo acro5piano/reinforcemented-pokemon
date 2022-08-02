@@ -1,5 +1,7 @@
 // use super::movement;
 
+use crate::util::pick_random_element_from_vec;
+
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct Pokemon {
     pub hp: i32,
@@ -41,3 +43,8 @@ pub const CLEFAIRY: Pokemon = Pokemon {
     hp: 343,
     // movement1: movement::SURF,
 };
+
+pub fn pick_random_pokemon() -> Pokemon {
+    let pokemons = vec![RHYDON, JOLTEON, STARMIE, CLEFAIRY];
+    pick_random_element_from_vec(pokemons)
+}

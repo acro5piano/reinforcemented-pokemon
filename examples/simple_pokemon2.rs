@@ -1,4 +1,8 @@
-use reinforcemented_pokemon::pokemon::{battle, player, pokemon};
+use reinforcemented_pokemon::pokemon::{
+    battle,
+    player::{Player, PokemonAction},
+    pokemon,
+};
 use reinforcemented_pokemon::q_learning::{agent::Agent, state::State, trainer::Trainer};
 use std::collections::HashMap;
 
@@ -21,58 +25,35 @@ use std::collections::HashMap;
 
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct SimplePokemonState {
-    pub learner: player::Player,
-    pub competitor: player::Player,
-}
-
-#[derive(Debug, Hash, Clone, Eq, PartialEq)]
-pub enum SimplePokemonAction {
-    ChooseRhydon,
-    ChooseJolteon,
-    ChooseStarmie,
-    ChooseClefairy,
+    pub learner: Player,
+    pub competitor: Player,
 }
 
 impl State for SimplePokemonState {
-    type Action = SimplePokemonAction;
+    type Action = PokemonAction;
 
     fn new() -> Self {
         SimplePokemonState {
-            learner: player::Player {
-                pokemon: Pokemon::Rhydon,
+            learner: Player {
+                pokemon1: pokemon::RHYDON,
+                pokemon2: pokemon::RHYDON,
             },
-            competitor: player::Player {
-                pokemon: Pokemon::Rhydon,
+            competitor: Player {
+                pokemon1: pokemon::RHYDON,
+                pokemon2: pokemon::RHYDON,
             },
         }
     }
 
     fn reward(&self) -> f64 {
-        match (&self.learner.pokemon, &self.competitor.pokemon) {
-            (Pokemon::Rhydon, Pokemon::Rhydon) => 0.0,
-            (Pokemon::Rhydon, Pokemon::Jolteon) => 1.0,
-            (Pokemon::Rhydon, Pokemon::Starmie) => -1.0,
-            (Pokemon::Rhydon, Pokemon::Clefairy) => 1.0,
-
-            (Pokemon::Jolteon, Pokemon::Rhydon) => -1.0,
-            (Pokemon::Jolteon, Pokemon::Jolteon) => 0.0,
-            (Pokemon::Jolteon, Pokemon::Starmie) => 1.0,
-            (Pokemon::Jolteon, Pokemon::Clefairy) => 1.0,
-
-            (Pokemon::Starmie, Pokemon::Rhydon) => 1.0,
-            (Pokemon::Starmie, Pokemon::Jolteon) => -1.0,
-            (Pokemon::Starmie, Pokemon::Starmie) => 0.0,
-            (Pokemon::Starmie, Pokemon::Clefairy) => 1.0,
-
-            (Pokemon::Clefairy, Pokemon::Rhydon) => -1.0,
-            (Pokemon::Clefairy, Pokemon::Jolteon) => -1.0,
-            (Pokemon::Clefairy, Pokemon::Starmie) => -1.0,
-            (Pokemon::Clefairy, Pokemon::Clefairy) => 0.0,
+        match (&self.competitor.pokemon1.hp, &self.competitor.pokemon2.hp) {
+            (0, 0) => 1.0,
+            _ => 0.0,
         }
     }
 
-    fn actions(&self) -> Vec<player::PokemonAction> {
-        vec![player::PokemonAction::Fight, player::PokemonAction::Change]
+    fn actions(&self) -> Vec<PokemonAction> {
+        vec![PokemonAction::Fight, PokemonAction::Change]
     }
 }
 
@@ -86,30 +67,32 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
         &self.state
     }
 
-    fn take_action(&mut self, action: &SimplePokemonAction) {
-        // The competitor is stupid and take a random action.
-        self.state.competitor.pokemon = match self.state.pick_random_action() {
-            SimplePokemonAction::ChooseRhydon => Pokemon::Rhydon,
-            SimplePokemonAction::ChooseJolteon => Pokemon::Jolteon,
-            SimplePokemonAction::ChooseStarmie => Pokemon::Starmie,
-            SimplePokemonAction::ChooseClefairy => Pokemon::Clefairy,
-        };
+    fn take_action(&mut self, step: i32, action: &SimplePokemonAction) {
+        if step == 0 {
+            // The competitor is stupid and take a random action.
+            self.state.competitor.pokemon = match self.state.pick_random_action() {
+                SimplePokemonAction::ChooseRhydon => Pokemon::Rhydon,
+                SimplePokemonAction::ChooseJolteon => Pokemon::Jolteon,
+                SimplePokemonAction::ChooseStarmie => Pokemon::Starmie,
+                SimplePokemonAction::ChooseClefairy => Pokemon::Clefairy,
+            };
 
-        // The learner is smart and take the action.
-        self.state.learner = match action {
-            SimplePokemonAction::ChooseRhydon => Player {
-                pokemon: Pokemon::Rhydon,
-            },
-            SimplePokemonAction::ChooseJolteon => Player {
-                pokemon: Pokemon::Jolteon,
-            },
-            SimplePokemonAction::ChooseStarmie => Player {
-                pokemon: Pokemon::Starmie,
-            },
-            SimplePokemonAction::ChooseClefairy => Player {
-                pokemon: Pokemon::Clefairy,
-            },
-        };
+            // The learner is smart and take the action.
+            self.state.learner = match action {
+                SimplePokemonAction::ChooseRhydon => Player {
+                    pokemon: Pokemon::Rhydon,
+                },
+                SimplePokemonAction::ChooseJolteon => Player {
+                    pokemon: Pokemon::Jolteon,
+                },
+                SimplePokemonAction::ChooseStarmie => Player {
+                    pokemon: Pokemon::Starmie,
+                },
+                SimplePokemonAction::ChooseClefairy => Player {
+                    pokemon: Pokemon::Clefairy,
+                },
+            };
+        }
     }
 
     fn is_completed(&self, step: i32) -> bool {
