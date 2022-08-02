@@ -33,3 +33,17 @@ pub const THUNDERBOLT: Movement = Movement {
     pp: 24,
     type_: Type::Electric,
 };
+
+pub const EARTHQUAKE: Movement = Movement {
+    power: 100,
+    accuracy: 1.0,
+    pp: 16,
+    type_: Type::Ground,
+};
+
+pub const SURF: Movement = Movement {
+    power: 95,
+    accuracy: 1.0,
+    pp: 24,
+    type_: Type::Water,
+};

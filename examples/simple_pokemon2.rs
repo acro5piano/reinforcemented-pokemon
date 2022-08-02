@@ -1,17 +1,23 @@
+use reinforcemented_pokemon::pokemon;
 use reinforcemented_pokemon::q_learning::{agent::Agent, state::State, trainer::Trainer};
 use std::collections::HashMap;
 
-// Let's start the verify basic one.
+// Let's advance the rule to the next step.
 // Think this basic Pokemon battle:
 //
 // - No critical, no miss, no status.
-// - Player chooses one of the Pokemon to use.
+// - Player chooses **two** of the Pokemon to use.
 // - Available Pokemons are:
-//     Rhydon
-//     Jolteon
-//     Starmie
-//     Clefairy
-// - Obviously, Clefairy is the worst Pokemon. How the AI learn it?
+//     Rhydon:
+//       - Earthquake
+//     Jolteon:
+//       - Thunderbolt
+//     Starmie:
+//       - Surf
+//     Clefairy:
+//       - Body Slam
+// - Obviously, Clefairy is the worst Pokemon. However, the rest of Pokemon is like Rock, Paper, Scissors.
+//   How the AI learn it?
 
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
 enum Pokemon {
