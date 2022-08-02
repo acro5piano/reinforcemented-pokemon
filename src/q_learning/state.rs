@@ -8,9 +8,9 @@ pub trait State: Eq + Hash + Clone {
 
     fn reward(&self) -> f64;
 
-    fn actions(&self) -> Vec<Self::Action>;
+    fn actions(&self, step: i32) -> Vec<Self::Action>;
 
-    fn pick_random_action(&self) -> Self::Action {
-        pick_random_element_from_vec(&self.actions()).clone()
+    fn pick_random_action(&self, step: i32) -> Self::Action {
+        pick_random_element_from_vec(&self.actions(step)).clone()
     }
 }
