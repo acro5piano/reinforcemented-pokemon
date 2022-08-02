@@ -135,17 +135,18 @@ fn main() {
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
+        e: 0.8,
         max_step: 10,
-        episodes: 1000000,
-        // on_step: None,
-        on_step: Some(|step, _state: &SimplePokemonState, q| {
-            use std::thread::sleep;
-            use std::time::Duration;
-            print!("\x1B[2J\x1B[1;1H");
-            println!("step: {}\n", step);
-            dbg!(q);
-            sleep(Duration::from_millis(20));
-        }),
+        episodes: 100000,
+        on_step: None,
+        // on_step: Some(|step, _state: &SimplePokemonState, q| {
+        //     use std::thread::sleep;
+        //     use std::time::Duration;
+        //     print!("\x1B[2J\x1B[1;1H");
+        //     println!("step: {}\n", step);
+        //     dbg!(q);
+        //     sleep(Duration::from_millis(20));
+        // }),
     };
 
     trainer.train(|| {

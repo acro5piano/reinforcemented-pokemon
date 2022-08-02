@@ -11,6 +11,7 @@ pub struct Trainer<S, A> {
     pub initial_value: f64,
     pub alpha: f64,
     pub gamma: f64,
+    pub e: f32,
     pub max_step: i32,
     pub episodes: i32,
     pub q: Q<S, A>,
@@ -36,7 +37,7 @@ where
                 let action = {
                     let rng = rand::thread_rng().gen::<f32>();
                     let existing = self.q.get(&s_t);
-                    if existing.is_some() && rng > 0.8 {
+                    if existing.is_some() && rng > self.e {
                         existing
                             .unwrap()
                             .iter()

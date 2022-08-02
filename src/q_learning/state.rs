@@ -1,3 +1,4 @@
+use crate::util::pick_random_element_from_vec;
 use std::hash::Hash;
 
 pub trait State: Eq + Hash + Clone {
@@ -10,8 +11,6 @@ pub trait State: Eq + Hash + Clone {
     fn actions(&self) -> Vec<Self::Action>;
 
     fn pick_random_action(&self) -> Self::Action {
-        let actions = self.actions();
-        let a_t = rand::random::<usize>() % actions.len();
-        actions[a_t].clone()
+        pick_random_element_from_vec(&self.actions()).clone()
     }
 }

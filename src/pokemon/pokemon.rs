@@ -1,6 +1,6 @@
 // use super::movement;
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct Pokemon {
     pub hp: i32,
     // pub attack: i32,

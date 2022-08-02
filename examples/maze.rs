@@ -124,8 +124,9 @@ fn main() {
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
-        max_step: 1000,
-        episodes: 100000,
+        e: 0.8,
+        max_step: 100,
+        episodes: 10000,
         on_step: None,
         // on_step: Some(|step, state: &MazeState, q| {
         //     use std::thread::sleep;

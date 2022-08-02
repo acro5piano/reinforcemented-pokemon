@@ -1,4 +1,4 @@
-use reinforcemented_pokemon::pokemon;
+use reinforcemented_pokemon::pokemon::{battle, player, pokemon};
 use reinforcemented_pokemon::q_learning::{agent::Agent, state::State, trainer::Trainer};
 use std::collections::HashMap;
 
@@ -20,22 +20,9 @@ use std::collections::HashMap;
 //   How the AI learn it?
 
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
-enum Pokemon {
-    Rhydon,
-    Jolteon,
-    Starmie,
-    Clefairy,
-}
-
-#[derive(Debug, Hash, Clone, Eq, PartialEq)]
-pub struct Player {
-    pokemon: Pokemon,
-}
-
-#[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct SimplePokemonState {
-    pub learner: Player,
-    pub competitor: Player,
+    pub learner: player::Player,
+    pub competitor: player::Player,
 }
 
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
@@ -51,10 +38,10 @@ impl State for SimplePokemonState {
 
     fn new() -> Self {
         SimplePokemonState {
-            learner: Player {
+            learner: player::Player {
                 pokemon: Pokemon::Rhydon,
             },
-            competitor: Player {
+            competitor: player::Player {
                 pokemon: Pokemon::Rhydon,
             },
         }
@@ -84,13 +71,8 @@ impl State for SimplePokemonState {
         }
     }
 
-    fn actions(&self) -> Vec<SimplePokemonAction> {
-        vec![
-            SimplePokemonAction::ChooseRhydon,
-            SimplePokemonAction::ChooseJolteon,
-            SimplePokemonAction::ChooseStarmie,
-            SimplePokemonAction::ChooseClefairy,
-        ]
+    fn actions(&self) -> Vec<player::PokemonAction> {
+        vec![player::PokemonAction::Fight, player::PokemonAction::Change]
     }
 }
 
@@ -141,6 +123,7 @@ fn main() {
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
+        e: 0.8,
         max_step: 10,
         episodes: 1000000,
         // on_step: None,
