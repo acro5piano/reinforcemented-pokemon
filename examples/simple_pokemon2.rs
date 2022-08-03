@@ -199,7 +199,24 @@ fn main() {
         q: HashMap::new(),
         e: 0.9,
         max_step: 100,
-        episodes: 100000,
+        episodes: 100,
+        on_step: None,
+    };
+
+    trainer.train(|| {
+        Box::new(SimplePokemonAgent {
+            state: SimplePokemonState::new(),
+        })
+    });
+
+    let mut trainer = Trainer {
+        initial_value: 0.0,
+        alpha: 0.5,
+        gamma: 0.9,
+        q: HashMap::new(),
+        e: 0.9,
+        max_step: 100,
+        episodes: 1000000,
         on_step: None,
     };
 
@@ -220,5 +237,22 @@ fn main() {
         })
     });
 
-    dbg!(&trainer.q);
+    // dbg!(&trainer.q);
+
+    let mut trainer = Trainer {
+        initial_value: 0.0,
+        alpha: 0.0,
+        gamma: 1.0,
+        q: trainer.q.clone(),
+        e: 0.0,
+        max_step: 100,
+        episodes: 1000,
+        on_step: None,
+    };
+    trainer.train(|| {
+        Box::new(SimplePokemonAgent {
+            state: SimplePokemonState::new(),
+        })
+    });
+    // println!("won_count: {}", &won_count.lock());
 }
