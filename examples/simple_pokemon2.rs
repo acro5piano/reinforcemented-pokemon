@@ -20,9 +20,6 @@ use std::collections::HashMap;
 //       - Thunderbolt
 //     Starmie:
 //       - Surf
-//     Clefairy:
-//       - Body Slam
-// - Obviously, Clefairy is the worst Pokemon. However, the rest of Pokemon is like Rock, Paper, Scissors.
 //   How the AI learn it?
 
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
@@ -65,26 +62,22 @@ impl State for SimplePokemonState {
         match step {
             0 => {
                 vec![
-                    PokemonAction::Choose(pokemon::RHYDON, pokemon::RHYDON),
                     PokemonAction::Choose(pokemon::RHYDON, pokemon::JOLTEON),
                     PokemonAction::Choose(pokemon::RHYDON, pokemon::STARMIE),
-                    PokemonAction::Choose(pokemon::RHYDON, pokemon::CLEFAIRY),
                     PokemonAction::Choose(pokemon::JOLTEON, pokemon::RHYDON),
-                    PokemonAction::Choose(pokemon::JOLTEON, pokemon::JOLTEON),
                     PokemonAction::Choose(pokemon::JOLTEON, pokemon::STARMIE),
-                    PokemonAction::Choose(pokemon::JOLTEON, pokemon::CLEFAIRY),
                     PokemonAction::Choose(pokemon::STARMIE, pokemon::RHYDON),
                     PokemonAction::Choose(pokemon::STARMIE, pokemon::JOLTEON),
-                    PokemonAction::Choose(pokemon::STARMIE, pokemon::STARMIE),
-                    PokemonAction::Choose(pokemon::STARMIE, pokemon::CLEFAIRY),
-                    PokemonAction::Choose(pokemon::CLEFAIRY, pokemon::RHYDON),
-                    PokemonAction::Choose(pokemon::CLEFAIRY, pokemon::JOLTEON),
-                    PokemonAction::Choose(pokemon::CLEFAIRY, pokemon::STARMIE),
-                    PokemonAction::Choose(pokemon::CLEFAIRY, pokemon::CLEFAIRY),
-                    // TODO: list all combinations of the Pokemon.
                 ]
             }
-            _ => vec![PokemonAction::Fight, PokemonAction::Change],
+            _ => {
+                let inactive_pokemon = self.learner.get_inactive_pokemon_unmut();
+                if inactive_pokemon.hp == 0 {
+                    vec![PokemonAction::Fight]
+                } else {
+                    vec![PokemonAction::Fight, PokemonAction::Change]
+                }
+            }
         }
     }
 }
@@ -116,12 +109,10 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
         } else {
             self.state.is_choosing = false;
 
-            let learner_inactive_pokemon = self.state.learner.get_inactive_pokemon();
-            let learner_action = if learner_inactive_pokemon.hp > 0 {
-                action
-            } else {
-                &PokemonAction::Fight
-            };
+            // let learner_inactive_pokemon = self.state.competitor.get_inactive_pokemon();
+            // assert!(
+            //     (action == &PokemonAction::Change && learner_inactive_pokemon.hp == 0) == false
+            // );
 
             // Random player
             let competitor_inactive_pokemon = self.state.competitor.get_inactive_pokemon();
@@ -131,16 +122,16 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
                 PokemonAction::Fight
             };
 
-            match (&learner_action, &competitor_action) {
+            match (&action, &competitor_action) {
                 (PokemonAction::Fight, PokemonAction::Fight) => {
                     let mut learner_active_pokemon = self.state.learner.get_active_pokemon();
                     let mut competitor_active_pokemon = self.state.competitor.get_active_pokemon();
                     let is_learner_move_first = {
-                        if &learner_active_pokemon.speed > &competitor_active_pokemon.speed {
-                            true
-                        } else {
+                        if &learner_active_pokemon.speed == &competitor_active_pokemon.speed {
                             let mut rng = rand::thread_rng();
                             rng.gen::<bool>()
+                        } else {
+                            &learner_active_pokemon.speed > &competitor_active_pokemon.speed
                         }
                     };
                     if is_learner_move_first {
@@ -212,12 +203,14 @@ fn main() {
         on_step: None,
     };
 
-    // trainer.on_step = Some(|step, _state: &SimplePokemonState, q| {
+    // trainer.on_step = Some(|step, state: &SimplePokemonState, q| {
+    //     use std::io::{stdin, Read};
     //     use std::thread::sleep;
     //     use std::time::Duration;
     //     print!("\x1B[2J\x1B[1;1H");
     //     println!("step: {}\n", step);
-    //     dbg!(q);
+    //     dbg!(state);
+    //     stdin().read(&mut [0]).unwrap();
     //     sleep(Duration::from_millis(20));
     // });
 

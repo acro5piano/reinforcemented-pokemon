@@ -42,15 +42,8 @@ pub const STARMIE: Pokemon = Pokemon {
     // movement1: movement::SURF,
 };
 
-pub const CLEFAIRY: Pokemon = Pokemon {
-    id: 4,
-    hp: 343,
-    speed: 35,
-    // movement1: movement::SURF,
-};
-
 pub fn pick_random_pokemon() -> Pokemon {
-    let pokemons = vec![RHYDON, JOLTEON, STARMIE, CLEFAIRY];
+    let pokemons = vec![RHYDON, JOLTEON, STARMIE];
     let a_t = rand::random::<usize>() % pokemons.len();
     pokemons[a_t]
 }
