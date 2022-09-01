@@ -11,6 +11,9 @@ pub struct Trainer<S, A> {
     pub initial_value: f64,
     pub alpha: f64,
     pub gamma: f64,
+    pub e: f32,
+    pub max_step: i32,
+    pub episodes: i32,
     pub q: Q<S, A>,
     pub on_step: Option<fn(i32, &S, q: &Q<S, A>) -> ()>,
 }
@@ -21,11 +24,15 @@ where
     A: Eq + Hash + Clone,
 {
     pub fn train(&mut self, agent_factory: AgentFactory<S>) {
-        for _ in 0..10000 {
+        let mut won_count = 0;
+        for _ in 0..self.episodes {
             let mut agent = agent_factory();
 
-            for step in 0..1000 {
-                if agent.is_completed() {
+            for step in 0..self.max_step {
+                if agent.is_completed(step) {
+                    if agent.current_state().reward() == 1.0 {
+                        won_count += 1;
+                    }
                     break;
                 }
 
@@ -34,20 +41,15 @@ where
                 let action = {
                     let rng = rand::thread_rng().gen::<f32>();
                     let existing = self.q.get(&s_t);
-                    if existing.is_some() && rng > 0.8 {
-                        existing
-                            .unwrap()
-                            .iter()
-                            .max_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap())
-                            .unwrap()
-                            .0
-                            .clone()
+
+                    if existing.is_some() && rng > self.e {
+                        self.get_max_value_action_or_random(step, &s_t)
                     } else {
-                        s_t.pick_random_action()
+                        s_t.pick_random_action(step)
                     }
                 };
 
-                agent.take_action(&action);
+                agent.take_action(step, &action);
 
                 let s_t_next = agent.current_state().clone();
                 let r_t_next = s_t_next.reward();
@@ -76,6 +78,30 @@ where
                     on_step(step, &agent.current_state(), &self.q);
                 }
             }
+        }
+        dbg!(won_count);
+    }
+
+    pub fn get_max_value_action_or_random(&self, step: i32, state: &S) -> A {
+        let existing = self.q.get(state);
+        let act = existing
+            .unwrap()
+            .iter()
+            .max_by(|(_, v1), (_, v2)| v1.partial_cmp(v2).unwrap())
+            .unwrap()
+            .0
+            .clone();
+        // consider step is >0
+        let mut is_available = false;
+        state.actions(step).iter().for_each(|a| {
+            if a == &act {
+                is_available = true;
+            }
+        });
+        if is_available {
+            act
+        } else {
+            state.pick_random_action(step)
         }
     }
 }

@@ -5,11 +5,11 @@ use std::collections::HashMap;
 //
 //     1   2   3
 //   |------------|
-// 1 | S :    :   |
-//   |------------|
-// 2 |   X    :   |
-//   |---------xxx|
-// 3 |   X    : G |
+// 1 | S          |
+//   |   |        |
+// 2 |   |        |
+//   |   |     ---|
+// 3 |   |      G |
 //   |------------|
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct MazeState {
@@ -85,7 +85,7 @@ impl Agent<MazeState> for MazeAgent {
         &self.state
     }
 
-    fn take_action(&mut self, action: &MazeAction) {
+    fn take_action(&mut self, _step: i32, action: &MazeAction) {
         match (self.state.x, self.state.y, action) {
             (3, 3, _) => {}
 
@@ -113,7 +113,7 @@ impl Agent<MazeState> for MazeAgent {
         }
     }
 
-    fn is_completed(&self) -> bool {
+    fn is_completed(&self, _step: i32) -> bool {
         self.state.x == 3 && self.state.y == 3
     }
 }
@@ -124,6 +124,9 @@ fn main() {
         alpha: 0.1,
         gamma: 0.9,
         q: HashMap::new(),
+        e: 0.8,
+        max_step: 100,
+        episodes: 10000,
         on_step: None,
         // on_step: Some(|step, state: &MazeState, q| {
         //     use std::thread::sleep;
