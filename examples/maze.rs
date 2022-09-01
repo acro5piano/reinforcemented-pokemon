@@ -5,11 +5,11 @@ use std::collections::HashMap;
 //
 //     1   2   3
 //   |------------|
-// 1 | S :    :   |
-//   |------------|
-// 2 |   X    :   |
-//   |---------xxx|
-// 3 |   X    : G |
+// 1 | S          |
+//   |   |        |
+// 2 |   |        |
+//   |   |     ---|
+// 3 |   |      G |
 //   |------------|
 #[derive(Debug, Hash, Clone, Eq, PartialEq)]
 pub struct MazeState {
