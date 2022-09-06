@@ -194,65 +194,19 @@ impl Agent<SimplePokemonState> for SimplePokemonAgent {
 fn main() {
     let mut trainer = Trainer {
         initial_value: 0.0,
-        alpha: 0.5,
+        alpha: 0.3,
         gamma: 0.9,
         q: HashMap::new(),
-        e: 0.9,
-        max_step: 100,
-        episodes: 100,
-        on_step: None,
-    };
-
-    trainer.train(|| {
-        Box::new(SimplePokemonAgent {
-            state: SimplePokemonState::new(),
-        })
-    });
-
-    let mut trainer = Trainer {
-        initial_value: 0.0,
-        alpha: 0.5,
-        gamma: 0.9,
-        q: HashMap::new(),
-        e: 0.9,
+        e: 0.1,
         max_step: 100,
         episodes: 1000000,
         on_step: None,
     };
-
-    // trainer.on_step = Some(|step, state: &SimplePokemonState, q| {
-    //     use std::io::{stdin, Read};
-    //     use std::thread::sleep;
-    //     use std::time::Duration;
-    //     print!("\x1B[2J\x1B[1;1H");
-    //     println!("step: {}\n", step);
-    //     dbg!(state);
-    //     stdin().read(&mut [0]).unwrap();
-    //     sleep(Duration::from_millis(20));
-    // });
-
+    dbg!(&trainer.q);
     trainer.train(|| {
         Box::new(SimplePokemonAgent {
             state: SimplePokemonState::new(),
         })
     });
-
-    // dbg!(&trainer.q);
-
-    let mut trainer = Trainer {
-        initial_value: 0.0,
-        alpha: 0.0,
-        gamma: 1.0,
-        q: trainer.q.clone(),
-        e: 0.0,
-        max_step: 100,
-        episodes: 1000,
-        on_step: None,
-    };
-    trainer.train(|| {
-        Box::new(SimplePokemonAgent {
-            state: SimplePokemonState::new(),
-        })
-    });
-    // println!("won_count: {}", &won_count.lock());
+    dbg!(&trainer.q);
 }

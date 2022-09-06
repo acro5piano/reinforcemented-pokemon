@@ -25,13 +25,15 @@ where
 {
     pub fn train(&mut self, agent_factory: AgentFactory<S>) {
         let mut won_count = 0;
-        for _ in 0..self.episodes {
+        let mut won_count_per_100_episode = 0;
+        for episode in 0..self.episodes {
             let mut agent = agent_factory();
 
             for step in 0..self.max_step {
                 if agent.is_completed(step) {
                     if agent.current_state().reward() == 1.0 {
                         won_count += 1;
+                        won_count_per_100_episode += 1;
                     }
                     break;
                 }
@@ -78,8 +80,12 @@ where
                     on_step(step, &agent.current_state(), &self.q);
                 }
             }
+
+            if episode % 100 == 0 {
+                println!("{}\t{}", episode, won_count_per_100_episode);
+                won_count_per_100_episode = 0;
+            }
         }
-        dbg!(won_count);
     }
 
     pub fn get_max_value_action_or_random(&self, step: i32, state: &S) -> A {
